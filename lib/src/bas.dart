@@ -73,7 +73,7 @@ class BasSDK {
           }),
           js.allowInterop((result){
             final object=dartify(result);
-            //AppLog.pdebug("----- ${object}");
+            print("-----BasSDK Lib basPayment result : ${object}");
             completer.complete(Transaction.fromJson(object));
           })
       );
