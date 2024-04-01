@@ -1,6 +1,6 @@
 name: bas_sdk
 description: bas_sdk
-version: 0.0.2
+version: 0.0.3
 homepage: https://github.com/ansiabdo/bas_sdk
 
 environment:
