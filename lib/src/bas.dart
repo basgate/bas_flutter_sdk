@@ -60,6 +60,9 @@ class BasSDK {
     required final String trxToken,
     required final String appId}) async {
 
+    LOGW("-----BasSDK Lib START basPayment -------");
+    LOGW("amount :$amount , currency :$currency , orderId :$orderId , trxToken :$trxToken , appId :$appId");
+
       final completer=Completer<Transaction>();
       jsBridgeCall("basPayment",
           jsify({
@@ -72,8 +75,9 @@ class BasSDK {
             "appId": appId
           }),
           js.allowInterop((result){
+            LOGW("-----BasSDK Lib basPayment Return result");
             final object=dartify(result);
-            print("-----BasSDK Lib basPayment result : ${object}");
+            LOGW("-----BasSDK Lib basPayment result : $object");
             completer.complete(Transaction.fromJson(object));
           })
       );

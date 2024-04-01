@@ -6,6 +6,7 @@
 // ignore_for_file: public_member_api_docs
 
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:js/js.dart';
 import 'package:js/js_util.dart' as util;
@@ -104,4 +105,9 @@ bool _isBasicType(Object? value) {
     return true;
   }
   return false;
+}
+
+LOGW(dynamic msg) {
+  log(msg.toString());
+  print(msg);
 }
