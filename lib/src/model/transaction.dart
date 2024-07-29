@@ -49,13 +49,13 @@ class TransactionData {
       TransactionData.fromJson(json.decode(text));
 
   TransactionData.fromJson(Map<String, dynamic> json) {
-    orderId = json['orderId'];
+    orderId = json['orderId'].toString();
     appId = json['appId'].toString();
     trxId = json['trxId'].toString();
     amount = Amount.fromJson(json['amount']);
-    paymentType = json['paymentType'];
-    date = json['date'];
-    status = json['status'];
+    paymentType = json['paymentType'].toString();
+    date = json['date'].toString();
+    status = json['status'].toString();
   }
 
   Map<String, dynamic> toJson() {

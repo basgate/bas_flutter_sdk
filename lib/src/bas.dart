@@ -78,7 +78,9 @@ class BasSDK {
         final object = dartify(result);
         LOGW("-----BasSDK Lib basPayment result : $object");
         completer.complete(Transaction.fromJson(object));
-      }));
+      },
+
+      ));
     } on Exception catch (e) {
       LOGW("-----BasSDK Lib basPayment ERROR :${e.toString()}");
     }
