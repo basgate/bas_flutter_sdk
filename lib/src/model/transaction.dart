@@ -29,12 +29,12 @@ class Transaction {
 
 class TransactionData {
   late String orderId;
-  late String appId;
-  late String trxId;
+  late String? appId;
+  late String? trxId;
   late Amount amount;
-  late String paymentType;
-  late String date;
-  late String status;
+  late String? paymentType;
+  late String? date;
+  late String? status;
 
   TransactionData(
       {required this.orderId,
@@ -43,19 +43,20 @@ class TransactionData {
         required this.amount,
         required this.paymentType,
         required this.date,
-        required this.status});
+        required this.status,
+      });
 
   static TransactionData fromString(String text) =>
       TransactionData.fromJson(json.decode(text));
 
   TransactionData.fromJson(Map<String, dynamic> json) {
-    orderId = json['orderId'];
-    appId = json['appId'].toString();
-    trxId = json['trxId'].toString();
+    orderId = json['orderId'].toString();
+    appId = json['appId']?.toString();
+    trxId = json['trxId']?.toString();
     amount = Amount.fromJson(json['amount']);
-    paymentType = json['paymentType'];
-    date = json['date'];
-    status = json['status'];
+    paymentType = json['paymentType']?.toString();
+    date = json['date']?.toString();
+    status = json['status']?.toString();
   }
 
   Map<String, dynamic> toJson() {
