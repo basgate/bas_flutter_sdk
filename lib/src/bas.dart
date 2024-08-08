@@ -9,8 +9,7 @@ import 'utils/js_interop.dart';
 import 'utils/util.dart';
 
 class BasSDK {
-  static final BasSDK _singleton = new BasSDK.internal();
-
+  static final BasSDK _singleton = BasSDK.internal();
   //bool _isReady=false;
 
   factory BasSDK() {
@@ -23,7 +22,9 @@ class BasSDK {
     final completer = Completer<SDKConfig>();
     //html.window.ad
     html.window.addEventListener('JSBridgeReady', (event) {
-      if (completer.isCompleted) return;
+      if (completer.isCompleted) {
+        return;
+      }
       print("JSBridgeReady");
       final messageEvent = (event as html.MessageEvent);
       Map<String, dynamic> data = messageEvent.data.cast<String, dynamic>();
@@ -45,12 +46,21 @@ class BasSDK {
 
   Future<AuthCode?> fetchAuthCode({required String clientId}) async {
     final completer = Completer<AuthCode>();
-    jsBridgeCall("basFetchAuthCode", jsify({"clientId": clientId}),
-        js.allowInterop((result) {
-      final object = dartify(result);
-      //AppLog.pdebug("----- ${object}");
-      completer.complete(AuthCode.fromJson(object));
-    }));
+    // jsBridgeCall("basFetchAuthCode", jsify({"clientId": clientId}),js.allowInterop((result){
+    //   final object=dartify(result);
+    //   //AppLog.pdebug("----- ${object}");
+    //   completer.complete(AuthCode.fromJson(object));
+    // }));
+    // return completer.future;
+    try {
+      jsBridgeCall("basFetchAuthCode", jsify({"clientId": clientId}), js.allowInterop((result) {
+        final object = dartify(result);
+        //AppLog.pdebug("----- ${object}");
+        completer.complete(AuthCode.fromJson(object));
+      }));
+    } catch (e) {
+      completer.complete(AuthCode(status: 0, messages: [e.toString()]));
+    }
     return completer.future;
   }
 
@@ -61,10 +71,28 @@ class BasSDK {
       required final String trxToken,
       required final String appId}) async {
     LOGW("-----BasSDK Lib START basPayment -------");
-    LOGW(
-        "amount :$amount , currency :$currency , orderId :$orderId , trxToken :$trxToken , appId :$appId");
+    LOGW("amount :$amount , currency :$currency , orderId :$orderId , trxToken :$trxToken , appId :$appId");
 
     final completer = Completer<Transaction>();
+    // jsBridgeCall("basPayment",
+    //     jsify({
+    //       "amount": {
+    //         "value":amount.toString(),
+    //         "currency": currency
+    //       },
+    //       "orderId": orderId,
+    //       "trxToken": trxToken,
+    //       "appId": appId
+    //     }),
+    //     js.allowInterop((result){
+    //       LOGW("-----BasSDK Lib basPayment Return result");
+    //       final object=dartify(result);
+    //       LOGW("-----BasSDK Lib basPayment result : $object");
+    //       completer.complete(Transaction.fromJson(object));
+    //     })
+    // );
+    // return completer.future;
+
     try {
       jsBridgeCall(
           "basPayment",
@@ -78,12 +106,11 @@ class BasSDK {
         final object = dartify(result);
         LOGW("-----BasSDK Lib basPayment result : $object");
         completer.complete(Transaction.fromJson(object));
-      },
-
-      ));
-    } on Exception catch (e) {
-      LOGW("-----BasSDK Lib basPayment ERROR :${e.toString()}");
+      }));
+    } catch (e) {
+      completer.complete(Transaction(status: 0, messages: [e.toString()]));
     }
+
     return completer.future;
   }
 
