@@ -14,16 +14,17 @@ class Transaction {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['status'] = status;
     data['data'] =  this.data?.toJson();
-    data['messages'] = this.messages;
+    data['messages'] = messages;
     return data;
   }
 
   static Transaction fromString(String text) =>
       Transaction.fromJson(json.decode(text));
 
+  @override
   String toString()=>json.encode(toJson());
 }
 
@@ -60,14 +61,14 @@ class TransactionData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['orderId'] = this.orderId;
-    data['appId'] = this.appId;
-    data['trxId'] = this.trxId;
-    data['amount'] = this.amount.toJson();
-    data['paymentType'] = this.paymentType;
-    data['date'] = this.date;
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['orderId'] = orderId;
+    data['appId'] = appId;
+    data['trxId'] = trxId;
+    data['amount'] = amount.toJson();
+    data['paymentType'] = paymentType;
+    data['date'] = date;
+    data['status'] = status;
     return data;
   }
 

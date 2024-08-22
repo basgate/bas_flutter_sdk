@@ -7,7 +7,8 @@ class AuthCode {
   int? status;
   AuthCodeData? data;
   List<String>? messages;
-  AuthCode({ this.status, this.data, this.messages});
+
+  AuthCode({this.status, this.data, this.messages});
 
   AuthCode.fromJson(Map<String, dynamic> json) {
     status = int.tryParse(json['status'].toString());
@@ -16,15 +17,17 @@ class AuthCode {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['status'] = this.status;
-    data['data'] =  this.data?.toJson();
-    data['messages'] = this.messages;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['status'] = status;
+    data['data'] = this.data?.toJson();
+    data['messages'] = messages;
     return data;
   }
 
-  String toString()=>json.encode(toJson());
+  @override
+  String toString() => json.encode(toJson());
 }
+
 class AuthCodeData {
   static AuthCodeData fromString(String text) =>
       AuthCodeData.fromJson(json.decode(text));
@@ -32,7 +35,7 @@ class AuthCodeData {
   String? authId;
   String? openId;
 
-  AuthCodeData({this.authId,this.openId});
+  AuthCodeData({this.authId, this.openId});
 
   AuthCodeData.fromJson(Map<String, dynamic> json) {
     authId = json['authId'].toString();
@@ -47,5 +50,5 @@ class AuthCodeData {
   }
 
   @override
-  String toString()=>json.encode(toJson());
+  String toString() => json.encode(toJson());
 }
