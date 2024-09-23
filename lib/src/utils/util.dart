@@ -5,9 +5,7 @@
 
 // ignore_for_file: public_member_api_docs
 
-import 'dart:async';
-import 'dart:developer';
-
+import 'package:flutter/foundation.dart';
 import 'package:js/js.dart';
 import 'package:js/js_util.dart' as util;
 
@@ -18,9 +16,9 @@ import 'js_interop.dart' as js;
 /// The optional [customDartify] function may return `null` to indicate,
 /// that it could not handle the given JS Object.
 dynamic dartify(
-    Object? jsObject, [
-      Object? Function(Object? object)? customDartify,
-    ]) {
+  Object? jsObject, [
+  Object? Function(Object? object)? customDartify,
+]) {
   if (_isBasicType(jsObject)) {
     return jsObject;
   }
@@ -51,9 +49,9 @@ dynamic dartify(
 
 // Converts an Iterable into a JS Array
 dynamic jsifyList(
-    Iterable list, [
-      Object? Function(Object? object)? customJsify,
-    ]) {
+  Iterable list, [
+  Object? Function(Object? object)? customJsify,
+]) {
   return js.toJSArray(list.map((item) => jsify(item, customJsify)).toList());
 }
 
@@ -62,9 +60,9 @@ dynamic jsifyList(
 /// The optional [customJsify] function may return `null` to indicate,
 /// that it could not handle the given Dart Object.
 dynamic jsify(
-    Object? dartObject, [
-      Object? Function(Object? object)? customJsify,
-    ]) {
+  Object? dartObject, [
+  Object? Function(Object? object)? customJsify,
+]) {
   if (_isBasicType(dartObject)) {
     return dartObject;
   }
@@ -107,7 +105,8 @@ bool _isBasicType(Object? value) {
   return false;
 }
 
-LOGW(dynamic msg) {
-  log(msg.toString());
-  print(msg);
+LOGW(dynamic msg, String subTag) {
+  if (kDebugMode) {
+    print('[BasSDK.$subTag]=> ${msg.toString()}');
+  }
 }

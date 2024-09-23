@@ -29,9 +29,8 @@ TODO: Include short and useful examples for package users. Add longer examples
 to `/example` folder. 
 
 ```dart
-import 'package:bas_sdk/bas_sdk.dart';
+import 'package:bas_sdk/base_bas_sdk.dart';
 //BasSDK.fetchAuthCode(clientId:"Your Id");
-
 ```
 
 ## Additional information

@@ -1,164 +1,152 @@
-import 'dart:async';
-import 'dart:html' as html;
-import 'dart:js' as js;
+// import 'dart:async';
+//
+// import 'package:bas_sdk/bas_sdk.dart';
+// import 'package:bas_sdk/src/callers/js_methods_caller.dart';
+// import 'package:bas_sdk/src/sandbox_network/sandbox_api.dart';
+// import 'package:bas_sdk/src/utils/ui_heper.dart';
+// import 'package:flutter/cupertino.dart';
+//
+// import 'base_bas_sdk.dart';
+// import 'utils/util.dart';
 
-import 'model/auth_code.dart';
-import 'model/lunch_url.dart';
-import 'model/bas_super_app_configs.dart';
-import 'model/transaction.dart';
-import 'utils/js_interop.dart';
+import 'dart:async';
+
+import 'package:bas_sdk/bas_sdk.dart';
+import 'package:bas_sdk/src/sandbox_network/sandbox_api.dart';
+import 'package:flutter/material.dart';
+
+import 'base_bas_sdk.dart';
+import 'callers/js_methods_caller.dart';
+import 'utils/ui_heper.dart';
 import 'utils/util.dart';
 
-class BasSDK {
+class BasSDK extends BaseBasSdk {
   static final BasSDK _singleton = BasSDK.internal();
 
-  //bool _isReady=false;
-
-  factory BasSDK() {
-    return _singleton;
-  }
+  factory BasSDK() => _singleton;
 
   BasSDK.internal();
 
-  Future<BasSuperAppConfigs> onReady() async {
+  //error type when not in bas app is => JSNoSuchMethodError
+
+  final JsMethodsCaller _jsMethodsCaller = JsMethodsCaller();
+  final SandBoxApi _sandBoxApi = SandBoxApi();
+
+  @override
+  Future<BasSuperAppConfigs> onReady({BasMode mode = BasMode.live}) async {
+    super.mode = mode;
+
+    LOGW("onReady START in ${super.mode.name}", 'onReady');
+    if (mode == BasMode.sandbox) {
+      return BasSuperAppConfigs(status: 1, envType: BasMode.sandbox);
+    } else {
+      BasSuperAppConfigs result = await _jsMethodsCaller.onReady();
+      LOGW("onReadyResult ${result.toJson()}", 'onReady');
+      return result;
+    }
+  }
+
+  /*Future<BasSuperAppConfigs> onReady({BasMode mode = BasMode.live}) async {
     final completer = Completer<BasSuperAppConfigs>();
+    print("JSBridgeReady Start");
+    try {
     //html.window.ad
-    html.window.addEventListener('JSBridgeReady', (event) {
-      if (completer.isCompleted) {
-        return;
-      }
-      print("JSBridgeReady");
-      final messageEvent = (event as html.MessageEvent);
-      Map<String, dynamic> data = messageEvent.data.cast<String, dynamic>();
-      print("JSBridgeReady ${data.toString()}");
-      completer.complete(BasSuperAppConfigs.fromJson(data));
-    }, true);
-    return completer.future;
-  }
-
-  // Future<String?> currentLocale() async {
-  //   final completer=Completer<String?>();
-  //   jsBridgeCall("basCurrentLocale",  jsify({}),js.allowInterop((result){
-  //     final object=dartify(result);
-  //     print("----- ${object}");
-  //     completer.complete(object["data"]["locale"]);
-  //   }));
-  //   return completer.future;
-  // }
-
-  Future<AuthCode?> fetchAuthCode({required String clientId}) async {
-    final completer = Completer<AuthCode>();
-    // jsBridgeCall("basFetchAuthCode", jsify({"clientId": clientId}),js.allowInterop((result){
-    //   final object=dartify(result);
-    //   //AppLog.pdebug("----- ${object}");
-    //   completer.complete(AuthCode.fromJson(object));
-    // }));
-    // return completer.future;
-    try {
-      jsBridgeCall("basFetchAuthCode", jsify({"clientId": clientId}),
-          js.allowInterop((result) {
-        final object = dartify(result);
-        //AppLog.pdebug("----- ${object}");
-        completer.complete(AuthCode.fromJson(object));
-      }));
+    html.window.addEventListener(
+      'JSBridgeReady',
+      (event) {
+        if (completer.isCompleted) {
+          return;
+        }
+        print("JSBridgeReady");
+        final messageEvent = (event as html.MessageEvent);
+        Map<String, dynamic> data = messageEvent.data.cast<String, dynamic>();
+        print("JSBridgeReady data ${data.toString()}");
+        completer.complete(BasSuperAppConfigs.fromJson(data));
+      },
+      true,
+    );
     } catch (e) {
-      completer.complete(AuthCode(status: 0, messages: [e.toString()]));
+      print("JSBridgeReady catch.error=> ${e.toString()}");
+      completer.complete(BasSuperAppConfigs(status: 0, messages: ['error']));
     }
+
     return completer.future;
+  }*/
+
+  @override
+  Future<AuthCode?> fetchAuthCode({
+    required String clientId,
+    BuildContext? context,
+  }) async {
+    assert(mode == BasMode.sandbox && context != null,
+        'context can not be null on sandbox mode');
+
+    LOGW("fetchAuthCode START in ${mode.name}", 'fetchAuthCode');
+
+    if (mode == BasMode.sandbox) {
+      UiHelper.buildDialog(context!);
+      AuthCode result = await _sandBoxApi.fetchAuthCode(clientId: clientId);
+      UiHelper.closeDialog();
+      return result;
+    } else {
+      return await _jsMethodsCaller.fetchAuthCode(
+          clientId: clientId, miniAppBasMode: mode);
+    }
   }
 
-  Future<Transaction?> payment(
-      {required final String amount,
-      final String currency = 'YER',
-      required final String orderId,
-      required final String trxToken,
-      required final String appId}) async {
-    LOGW("-----BasSDK Lib START basPayment -------");
+  @override
+  Future<Transaction?> payment({
+    required final String amount,
+    final String currency = 'YER',
+    required final String orderId,
+    required final String trxToken,
+    required final String appId,
+    BuildContext? context,
+  }) async {
+    assert(mode == BasMode.sandbox && context != null,
+        'context can not be null on sandbox mode');
+
+    LOGW("basPayment START in ${mode.name}", 'payment');
     LOGW(
-        "amount :$amount , currency :$currency , orderId :$orderId , trxToken :$trxToken , appId :$appId");
+        "amount:$amount, currency:$currency, orderId:$orderId, trxToken:$trxToken, appId:$appId",
+        'payment');
 
-    final completer = Completer<Transaction>();
-    // jsBridgeCall("basPayment",
-    //     jsify({
-    //       "amount": {
-    //         "value":amount.toString(),
-    //         "currency": currency
-    //       },
-    //       "orderId": orderId,
-    //       "trxToken": trxToken,
-    //       "appId": appId
-    //     }),
-    //     js.allowInterop((result){
-    //       LOGW("-----BasSDK Lib basPayment Return result");
-    //       final object=dartify(result);
-    //       LOGW("-----BasSDK Lib basPayment result : $object");
-    //       completer.complete(Transaction.fromJson(object));
-    //     })
-    // );
-    // return completer.future;
-
-    try {
-      jsBridgeCall(
-          "basPayment",
-          jsify({
-            "amount": {"value": amount.toString(), "currency": currency},
-            "orderId": orderId,
-            "trxToken": trxToken,
-            "appId": appId
-          }), js.allowInterop((result) {
-        LOGW("-----BasSDK Lib basPayment Return result");
-        final object = dartify(result);
-        LOGW("-----BasSDK Lib basPayment result : $object");
-        completer.complete(Transaction.fromJson(object));
-      }));
-    } catch (e) {
-      completer.complete(Transaction(status: 0, messages: [e.toString()]));
+    if (mode == BasMode.sandbox) {
+      // UiHelper.buildDialog(context!);
+      // await Future.delayed(const Duration(seconds: 3));
+      await UiHelper.buildBottomSheet(context!);
+      UiHelper.buildDialog(context!);
+      Transaction result = await _sandBoxApi.payment(
+        trxToken: trxToken,
+        amount: amount,
+        currency: currency,
+        appId: appId,
+        orderId: orderId,
+      );
+      UiHelper.closeDialog();
+      return result;
+    } else {
+      return await _jsMethodsCaller.payment(
+        trxToken: trxToken,
+        amount: amount,
+        currency: currency,
+        appId: appId,
+        orderId: orderId,
+        miniAppBasMode: mode,
+      );
     }
-
-    return completer.future;
   }
 
+  @override
   Future<LunchUrl?> basLaunchURL({required String urlToLunch}) async {
-    final completer = Completer<LunchUrl>();
-
-    try {
-      jsBridgeCall("basLaunchURL", jsify({"urlToLunch": urlToLunch}),
-          js.allowInterop((result) {
-        final object = dartify(result);
-        completer.complete(LunchUrl.fromJson(object));
-      }));
-    } catch (e) {
-      completer.complete(LunchUrl(status: 0, messages: [e.toString()]));
-    }
-    return completer.future;
+    LOGW("basLaunchURL START in ${mode.name}", 'basLaunchURL');
+    return await _jsMethodsCaller.basLaunchURL(urlToLunch: urlToLunch);
   }
 
-  Future<BasSuperAppConfigs?> currentLocale() async {
-    final completer = Completer<BasSuperAppConfigs>();
-
-    try {
-      jsBridgeCall("basCurrentLocale", jsify({}), js.allowInterop((result) {
-        final object = dartify(result);
-        completer.complete(BasSuperAppConfigs.fromJson(object));
-      }));
-    } catch (e) {
-      completer.complete(BasSuperAppConfigs(status: 0, messages: [e.toString()]));
-    }
-    return completer.future;
-  }
-
+  @override
   Future<BasSuperAppConfigs?> basConfigs() async {
-    final completer = Completer<BasSuperAppConfigs>();
-
-    try {
-      jsBridgeCall("basConfigs", jsify({}), js.allowInterop((result) {
-        final object = dartify(result);
-        completer.complete(BasSuperAppConfigs.fromJson(object));
-      }));
-    } catch (e) {
-      completer.complete(BasSuperAppConfigs(status: 0, messages: [e.toString()]));
-    }
-    return completer.future;
+    LOGW("basConfigs START in ${mode.name}", 'basConfigs');
+    return await _jsMethodsCaller.basConfigs();
   }
 
   void dispose() {

@@ -1,12 +1,11 @@
 import 'dart:async';
 
-import 'package:bas_sdk/src/model/lunch_url.dart';
+import 'package:bas_sdk/bas_sdk.dart';
+import 'package:flutter/material.dart';
 
-import 'model/auth_code.dart';
-import 'model/bas_super_app_configs.dart';
-import 'model/transaction.dart';
+import 'base_bas_sdk.dart';
 
-class BasSDK {
+class BasSDK extends BaseBasSdk {
   static final BasSDK _singleton = BasSDK.internal();
 
   factory BasSDK() {
@@ -15,38 +14,50 @@ class BasSDK {
 
   BasSDK.internal();
 
-  Future<BasSuperAppConfigs> onReady() async {
+  @override
+  Future<BasSuperAppConfigs> onReady({BasMode mode = BasMode.live}) async {
     return BasSuperAppConfigs(
       locale: "en",
     );
   }
 
-  // Future<String?> currentLocale() async {
-  //   return "en";
-  // }
-
-  Future<AuthCode?> fetchAuthCode({required String clientId}) async {
+  @override
+  Future<AuthCode?> fetchAuthCode(
+      {required String clientId, BuildContext? context}) async {
     return AuthCode(
-        status: -10, messages: ["error getting auth code out side super app!"]);
+      status: -10,
+      messages: ['Error call fetchAuthCode out side super app!'],
+    );
   }
 
-  Future<Transaction?> payment(
-      {required final String amount,
-      final String currency = 'YER',
-      required final String orderId,
-      required final String trxToken,
-      required final String appId}) async {
+  @override
+  Future<Transaction?> payment({
+    required final String amount,
+    final String currency = 'YER',
+    required final String orderId,
+    required final String trxToken,
+    required final String appId,
+    BuildContext? context,
+  }) async {
     return Transaction(
-        status: -10, messages: ["error getting payment out side super app!"]);
+      status: -10,
+      messages: ['Error call payment out side super app!'],
+    );
   }
 
+  @override
   Future<LunchUrl?> basLaunchURL({required String urlToLunch}) async {
     return LunchUrl(
-        status: -10, messages: ["error lunch url out side super app!"]);
+      status: -10,
+      messages: ['Error call basLaunchURL out side super app!'],
+    );
   }
 
+  @override
   Future<BasSuperAppConfigs?> basConfigs() async {
     return BasSuperAppConfigs(
-        status: -10, messages: ["error in get basConfigs out side super app!"]);
+      status: -10,
+      messages: ['Error call basConfigs out side super app!'],
+    );
   }
 }

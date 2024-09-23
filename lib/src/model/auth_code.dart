@@ -10,10 +10,12 @@ class AuthCode {
 
   AuthCode({this.status, this.data, this.messages});
 
-  AuthCode.fromJson(Map<String, dynamic> json) {
-    status = int.tryParse(json['status'].toString());
-    data = AuthCodeData.fromJson(json['data']);
-    messages = json['messages']?.map<String>((e) => e.toString())?.toList();
+  factory AuthCode.fromJson(Map<String, dynamic> json) {
+    return AuthCode(
+      status: int.tryParse(json['status'].toString()) ?? 0,
+      messages: json['messages']?.map<String>((e) => e.toString())?.toList(),
+      data: json['data'] == null ? null : AuthCodeData.fromJson(json['data']),
+    );
   }
 
   Map<String, dynamic> toJson() {

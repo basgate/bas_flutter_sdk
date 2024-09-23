@@ -1,23 +1,21 @@
 import 'dart:convert';
+import 'bas_mode.dart';
 
-enum BasEnvType {
-  stage,
-  live,
-}
+
 
 class BasSuperAppConfigs {
   int? status;
   String? locale;
   bool? isInBasSuperApp;
   List<String>? messages;
-  BasEnvType? envType;
+  BasMode? envType;
 
   BasSuperAppConfigs({
     this.status,
     this.messages,
     this.locale,
     this.isInBasSuperApp = false,
-    this.envType = BasEnvType.stage,
+    this.envType = BasMode.live,
   });
 
   static BasSuperAppConfigs fromString(String text) =>
@@ -28,13 +26,13 @@ class BasSuperAppConfigs {
 
   factory BasSuperAppConfigs.fromJson(Map<String, dynamic> json) {
     return BasSuperAppConfigs(
-      status: int.tryParse(json['status'].toString()),
+      status: int.tryParse(json['status'].toString()) ?? 0,
       locale: json['locale']?.toString(),
       isInBasSuperApp: json['isInBasSuperApp'] ?? false,
       messages: json['messages']?.map<String>((e) => e.toString())?.toList(),
-      envType: BasEnvType.values.firstWhere(
+      envType: BasMode.values.firstWhere(
         (e) => e.name == json['envType'],
-        orElse: () => BasEnvType.stage,
+        orElse: () => BasMode.live,
       ),
     );
   }
