@@ -60,4 +60,9 @@ class BasSDK extends BaseBasSdk {
       messages: ['Error call basConfigs out side super app!'],
     );
   }
+
+  @override
+  Future<bool?> closeMiniApp() async {
+    return true;
+  }
 }

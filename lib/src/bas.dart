@@ -78,8 +78,10 @@ class BasSDK extends BaseBasSdk {
     required String clientId,
     BuildContext? context,
   }) async {
-    assert(mode == BasMode.sandbox && context != null,
-        'context can not be null on sandbox mode');
+
+    if(mode == BasMode.sandbox) {
+      assert(context != null, 'context can not be null on sandbox mode');
+    }
 
     LOGW("fetchAuthCode START in ${mode.name}", 'fetchAuthCode');
 
@@ -103,8 +105,10 @@ class BasSDK extends BaseBasSdk {
     required final String appId,
     BuildContext? context,
   }) async {
-    assert(mode == BasMode.sandbox && context != null,
-        'context can not be null on sandbox mode');
+
+    if(mode == BasMode.sandbox) {
+      assert(context != null, 'context can not be null on sandbox mode');
+    }
 
     LOGW("basPayment START in ${mode.name}", 'payment');
     LOGW(
@@ -147,6 +151,12 @@ class BasSDK extends BaseBasSdk {
   Future<BasSuperAppConfigs?> basConfigs() async {
     LOGW("basConfigs START in ${mode.name}", 'basConfigs');
     return await _jsMethodsCaller.basConfigs();
+  }
+
+  @override
+  Future<bool?> closeMiniApp() async {
+    LOGW("closeMiniApp START in ${mode.name}", 'closeMiniApp');
+    return await _jsMethodsCaller.closeMiniApp();
   }
 
   void dispose() {

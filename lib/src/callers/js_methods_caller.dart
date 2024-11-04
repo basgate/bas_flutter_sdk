@@ -171,4 +171,23 @@ class JsMethodsCaller {
     }
     return completer.future;
   }
+
+  Future<bool?> closeMiniApp() async {
+    final completer = Completer<bool>();
+
+    try {
+      jsBridgeCall("closeMiniApp", jsify({}), js.allowInterop((result) {
+        final object = dartify(result);
+        completer.complete(object);
+      }));
+    } catch (e) {
+      LOGW(e.toString(), 'closeMiniApp.CatchError');
+      if (e.runtimeType is NoSuchMethodError) {
+        completer.complete(false);
+      } else {
+        completer.complete(false);
+      }
+    }
+    return completer.future;
+  }
 }

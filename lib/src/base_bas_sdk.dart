@@ -28,5 +28,7 @@ abstract class BaseBasSdk {
 
   Future<BasSuperAppConfigs?> basConfigs();
 
+  Future<bool?> closeMiniApp();
+
   BasMode mode = BasMode.live;
 }
