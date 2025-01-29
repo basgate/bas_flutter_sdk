@@ -74,57 +74,66 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-              ),
-              onPressed: () => fetchAuthCode(successClientId),
-              child: const Text('Success Auth'),
-            ),
-            const SizedBox(
-              height: 16.0,
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red.shade700,
-              ),
-              onPressed: () => fetchAuthCode(failedClientId),
-              child: const Text('Failed Auth'),
-            ),
-            const SizedBox(height: 16.0),
-            const Divider(),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-              ),
-              onPressed: () => payment(DataToPayment.success),
-              child: const Text('Success Payment'),
-            ),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red.shade700,
-              ),
-              onPressed: () => payment(DataToPayment.failed),
-              child: const Text('Failed Payment'),
-            ),
-            const SizedBox(
-              height: 16.0,
-            ),
-          ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, result) {
+        //instead of using SystemNavigator.pop() or Navigator.pop(context),
+        //you can call _basSDK.closeMiniApp() to close your mini app and go back to Bas super app.
+
+        _basSDK.closeMiniApp();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
         ),
+        body: Center(
+          child: Column(
+            // horizontal).
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                ),
+                onPressed: () => fetchAuthCode(successClientId),
+                child: const Text('Success Auth'),
+              ),
+              const SizedBox(
+                height: 16.0,
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red.shade700,
+                ),
+                onPressed: () => fetchAuthCode(failedClientId),
+                child: const Text('Failed Auth'),
+              ),
+              const SizedBox(height: 16.0),
+              const Divider(),
+              const SizedBox(height: 16.0),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                ),
+                onPressed: () => payment(DataToPayment.success),
+                child: const Text('Success Payment'),
+              ),
+              const SizedBox(height: 16.0),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red.shade700,
+                ),
+                onPressed: () => payment(DataToPayment.failed),
+                child: const Text('Failed Payment'),
+              ),
+              const SizedBox(
+                height: 16.0,
+              ),
+            ],
+          ),
+        ),
+        // This trailing comma makes auto-formatting nicer for build methods.
       ),
-      // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
