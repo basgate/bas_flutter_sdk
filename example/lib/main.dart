@@ -1,6 +1,9 @@
 import 'package:bas_sdk/bas_sdk.dart';
 import 'package:example/models/data_to_payment.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_json_view/flutter_json_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -34,6 +37,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final BasSDK _basSDK = BasSDK();
 
+  Map<String, dynamic>? response;
+  bool? isSuccessResponse;
+
   @override
   void initState() {
     super.initState();
@@ -55,12 +61,16 @@ class _MyHomePageState extends State<MyHomePage> {
       clientId: clientId,
       context: context,
     );
-
     print('fetchAuthCode.result=>${result?.toJson()}');
+
+    setState(() {
+      isSuccessResponse = result?.status == 1;
+      response = result?.toJson();
+    });
   }
 
-  void payment(DataToPayment data) async {
-    var result = await _basSDK.payment(
+  payment(DataToPayment data) async {
+    Transaction? result = await _basSDK.payment(
       orderId: data.orderId!,
       appId: data.appId!,
       amount: data.amount!.value.toString(),
@@ -68,8 +78,11 @@ class _MyHomePageState extends State<MyHomePage> {
       trxToken: data.trxId!,
       context: context,
     );
-
     print('payment.result=>${result?.toJson()}');
+    setState(() {
+      isSuccessResponse = result?.status == 1;
+      response = result?.toJson();
+    });
   }
 
   @override
@@ -79,61 +92,150 @@ class _MyHomePageState extends State<MyHomePage> {
       onPopInvokedWithResult: (bool didPop, result) {
         //instead of using SystemNavigator.pop() or Navigator.pop(context),
         //you can call _basSDK.closeMiniApp() to close your mini app and go back to Bas super app.
-
+        print('called onPopInvoked with basSdk');
         _basSDK.closeMiniApp();
       },
       child: Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
         ),
-        body: Center(
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
           child: Column(
             // horizontal).
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                ),
-                onPressed: () => fetchAuthCode(successClientId),
-                child: const Text('Success Auth'),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                    ),
+                    onPressed: () => fetchAuthCode(successClientId),
+                    child: const Text('Success Auth'),
+                  ),
+                  const SizedBox(
+                    width: 16.0,
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red.shade700,
+                    ),
+                    onPressed: () => fetchAuthCode(failedClientId),
+                    child: const Text('Failed Auth'),
+                  ),
+                ],
               ),
-              const SizedBox(
-                height: 16.0,
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red.shade700,
-                ),
-                onPressed: () => fetchAuthCode(failedClientId),
-                child: const Text('Failed Auth'),
-              ),
-              const SizedBox(height: 16.0),
               const Divider(),
-              const SizedBox(height: 16.0),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                ),
-                onPressed: () => payment(DataToPayment.success),
-                child: const Text('Success Payment'),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                    ),
+                    onPressed: () => payment(DataToPayment.success),
+                    child: const Text('Success Payment'),
+                  ),
+                  const SizedBox(width: 16.0),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red.shade700,
+                    ),
+                    onPressed: () => payment(DataToPayment.failed),
+                    child: const Text('Failed Payment'),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16.0),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red.shade700,
+              const Divider(),
+              Expanded(
+                child: JsonViewerWidget(
+                  isSuccess: isSuccessResponse,
+                  response: response,
+                  // isSuccess: failedResponse == null && successResponse == null,
+                  onClear: () => setState(() {
+                    isSuccessResponse = null;
+                    response = null;
+                  }),
                 ),
-                onPressed: () => payment(DataToPayment.failed),
-                child: const Text('Failed Payment'),
-              ),
-              const SizedBox(
-                height: 16.0,
               ),
             ],
           ),
         ),
         // This trailing comma makes auto-formatting nicer for build methods.
       ),
+    );
+  }
+}
+
+class JsonViewerWidget extends StatelessWidget {
+  final bool? isSuccess;
+  final Map<String, dynamic>? response;
+  final VoidCallback onClear;
+
+  const JsonViewerWidget(
+      {super.key,
+      this.response,
+      required this.onClear,
+      required this.isSuccess});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          children: [
+            Text(
+              isSuccess == null
+                  ? 'Response'
+                  : (isSuccess! ? 'Success Response' : 'Failed Response'),
+              style: TextStyle(
+                fontSize: 18.0,
+                color: isSuccess == null
+                    ? null
+                    : (isSuccess! ? Colors.green : Colors.red),
+              ),
+            ),
+            const Spacer(),
+            InkWell(
+              borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+              radius: 8.0,
+              onTap: () async {
+                await Clipboard.setData(
+                  ClipboardData(
+                    text: response.toString(),
+                  ),
+                );
+              },
+              child: const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                child: Icon(Icons.copy),
+              ),
+            ),
+            const SizedBox(width: 8.0),
+            InkWell(
+              borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+              radius: 8.0,
+              onTap: onClear,
+              child: const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                child: Icon(
+                  Icons.delete_sweep_outlined,
+                ),
+              ),
+            )
+          ],
+        ),
+        Expanded(
+          child: JsonView.map(response ?? {},
+              theme: JsonViewTheme(
+                  // backgroundColor: Colors.white,
+                  )),
+        ),
+      ],
     );
   }
 }
