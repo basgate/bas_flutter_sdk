@@ -48,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   initBasSD() async {
     var result = await _basSDK.onReady(
-      mode: BasMode.sandbox,
+      mode: BasMode.live,
     );
     print('onReady.result=>${result.toJson()}');
   }
@@ -226,14 +226,11 @@ class JsonViewerWidget extends StatelessWidget {
                   Icons.delete_sweep_outlined,
                 ),
               ),
-            )
+            ),
           ],
         ),
         Expanded(
-          child: JsonView.map(response ?? {},
-              theme: JsonViewTheme(
-                  // backgroundColor: Colors.white,
-                  )),
+          child: JsonView.map(response ?? {}),
         ),
       ],
     );

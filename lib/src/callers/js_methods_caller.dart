@@ -55,11 +55,13 @@ class JsMethodsCaller {
       );
     } catch (e) {
       LOGW(e.toString(), 'JsMethodsCaller.fetchAuthCode.CatchError');
-      if (e.runtimeType is NoSuchMethodError) {
+      if (e is NoSuchMethodError) {
         completer.complete(
           AuthCode(
             status: 0,
-            messages: ['"Error call fetchAuthCode out side super app!"'],
+            messages: [
+              '"Error you can NOT call fetchAuthCode out side super app!"'
+            ],
           ),
         );
       } else {
@@ -101,11 +103,11 @@ class JsMethodsCaller {
       );
     } catch (e) {
       LOGW(e.toString(), 'payment.CatchError');
-      if (e.runtimeType is NoSuchMethodError) {
+      if (e is NoSuchMethodError) {
         completer.complete(
           Transaction(
             status: 0,
-            messages: ['Error call payment out side super app!'],
+            messages: ['Error you can NOT call payment out side super app!'],
           ),
         );
       } else {
@@ -132,11 +134,11 @@ class JsMethodsCaller {
       );
     } catch (e) {
       LOGW(e.toString(), 'basLaunchURL.CatchError');
-      if (e.runtimeType is NoSuchMethodError) {
+      if (e is NoSuchMethodError) {
         completer.complete(
           LunchUrl(
             status: 0,
-            messages: ['Error call basLaunchURL out side super app!'],
+            messages: ['Error you can NOT call basLaunchURL out side super app!'],
           ),
         );
       } else {
@@ -155,13 +157,12 @@ class JsMethodsCaller {
         completer.complete(BasSuperAppConfigs.fromJson(object));
       }));
     } catch (e) {
-      // LOGW(e.runtimeType.toString(), 'basConfigs.runtimeType.CatchError');
       LOGW(e.toString(), 'basConfigs.CatchError');
-      if (e.runtimeType is NoSuchMethodError) {
+      if (e is NoSuchMethodError) {
         completer.complete(
           BasSuperAppConfigs(
             status: 0,
-            messages: ['Error call basConfigs out side super app!'],
+            messages: ['Error you can NOT call basConfigs out side super app!'],
           ),
         );
       } else {
@@ -174,7 +175,6 @@ class JsMethodsCaller {
 
   Future<bool?> closeMiniApp() async {
     final completer = Completer<bool>();
-
     try {
       jsBridgeCall("closeMiniApp", jsify({}), js.allowInterop((result) {
         final object = dartify(result);
@@ -182,7 +182,7 @@ class JsMethodsCaller {
       }));
     } catch (e) {
       LOGW(e.toString(), 'closeMiniApp.CatchError');
-      if (e.runtimeType is NoSuchMethodError) {
+      if (e is NoSuchMethodError) {
         completer.complete(false);
       } else {
         completer.complete(false);
