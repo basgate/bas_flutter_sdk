@@ -65,4 +65,9 @@ class BasSDK extends BaseBasSdk {
   Future<bool?> closeMiniApp() async {
     return true;
   }
+
+  @override
+  Future<bool> requestLocationPermission() async {
+    return true;
+  }
 }

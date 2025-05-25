@@ -190,4 +190,21 @@ class JsMethodsCaller {
     }
     return completer.future;
   }
+  Future<bool> requestLocationPermission() async {
+    final completer = Completer<bool>();
+    try {
+      jsBridgeCall("requestLocationPermission", jsify({}), js.allowInterop((result) {
+        final object = dartify(result);
+        completer.complete(object);
+      }));
+    } catch (e) {
+      LOGW(e.toString(), 'requestLocationPermission.CatchError');
+      if (e is NoSuchMethodError) {
+        completer.complete(false);
+      } else {
+        completer.complete(false);
+      }
+    }
+    return completer.future;
+  }
 }

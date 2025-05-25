@@ -29,6 +29,7 @@ abstract class BaseBasSdk {
   Future<BasSuperAppConfigs?> basConfigs();
 
   Future<bool?> closeMiniApp();
+  Future<bool> requestLocationPermission();
 
   BasMode mode = BasMode.live;
 }

@@ -1,6 +1,5 @@
 import 'package:bas_sdk/bas_sdk.dart';
 import 'package:example/models/data_to_payment.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_json_view/flutter_json_view.dart';
@@ -85,6 +84,19 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  requestLocationPermission() async {
+    bool result = await _basSDK.requestLocationPermission();
+    print('requestLocationPermission.result=>$result');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Location permission ${result ? 'granted' : 'denied'}',
+        ),
+        backgroundColor: result ? Colors.green : Colors.red,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -148,6 +160,14 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: const Text('Failed Payment'),
                   ),
                 ],
+              ),
+              const Divider(),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                ),
+                onPressed: requestLocationPermission,
+                child: const Text('Request Location Permission'),
               ),
               const Divider(),
               Expanded(

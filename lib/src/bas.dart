@@ -159,6 +159,12 @@ class BasSDK extends BaseBasSdk {
     return await _jsMethodsCaller.closeMiniApp();
   }
 
+  @override
+  Future<bool> requestLocationPermission() async {
+    LOGW("requestLocationPermission START in ${mode.name}", 'requestLocationPermission');
+    return await _jsMethodsCaller.requestLocationPermission();
+  }
+
   void dispose() {
     //headlessWebView?.dispose();
   }
